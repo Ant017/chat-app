@@ -10,6 +10,7 @@ const chatSchema = new mongoose.Schema({
     },
     lastMessage: {
         type: mongoose.Types.ObjectId,
+        default: null,
         ref: "Message",
     },
     participants: [
