@@ -9,5 +9,7 @@ routes.get("/get-all-chats", isUserLoggedIn, ChatController.getAllChat)
 routes.post("/create-group-chat", isUserLoggedIn, ChatController.createGroupChat)
 routes.post("/add-participants", isUserLoggedIn, ChatController.addParticipant)
 routes.patch("/remove-participants", isUserLoggedIn, ChatController.removeParticipant)
+routes.patch("/rename-group-chat", isUserLoggedIn, ChatController.renameGroupChat)
+routes.patch("/change-admin", isUserLoggedIn, ChatController.changeAdmin)
 
 module.exports = routes 

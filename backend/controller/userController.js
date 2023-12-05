@@ -3,9 +3,6 @@ const userModel = require("../model/user")
 const response = require("../utils/successError")
 const http = require("../constants/statusCodes")
 const mongoose = require("mongoose")
-const bcrypt = require("bcrypt")
-const jwt = require("jsonwebtoken")
-const crypto = require('crypto')
 const { validationResult } = require("express-validator")
 
 class UserController {
@@ -25,7 +22,9 @@ class UserController {
 
     async allUserInfo(req, res) {
         try {
-            const user = await userModel.find()
+            const user = await userModel.find(
+                { _id: { $ne: new mongoose.Types.ObjectId(req.user.userID) } }
+            )
             if (!user) {
                 return response(res, http.BAD_REQUEST, "User not found")
             }
@@ -35,6 +34,8 @@ class UserController {
             return response(res, http.INTERNAL_SERVER_ERROR, "Internal Server Error", error.message)
         }
     }
+
+    
 }
 
 module.exports = new UserController()
