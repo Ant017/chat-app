@@ -104,7 +104,8 @@ class MessageController {
 
       const messages = await messageModel.find({
         chat: chatID,
-      });
+      }).populate("sender", "username email profilePic")
+
       if (!messages) {
         return response(res, http.NOT_FOUND, "Messages not found");
       }

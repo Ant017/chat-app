@@ -40,6 +40,7 @@ const LoginBoxMolecule = () => {
         const response = await LoginApi(data)
         if (response) {
             dispatch(saveLogin(response));
+            localStorage.setItem('token', response.token);
             navigate('/chat');
         }
     };

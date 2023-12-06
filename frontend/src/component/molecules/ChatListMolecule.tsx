@@ -3,11 +3,16 @@ import { RxDotsHorizontal } from "react-icons/rx";
 import { useNavigate } from "react-router-dom";
 
 type Props = {
-  chatID: number;
+  chatID: string;
+  username: string;
+  lastMessage: string;
+  imageUrl: string;
+  timestamp: string;
 };
 
 const ChatListMolecule = (props: Props) => {
   const navigate = useNavigate();
+
   return (
     <div
       onClick={() => {
@@ -19,16 +24,17 @@ const ChatListMolecule = (props: Props) => {
         <div className="w-10 h-10">
           <img
             className="w-full h-full object-cover object-center rounded-full"
-            src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80"
-          ></img>
+            src={props.imageUrl}
+            alt="User Avatar"
+          />
         </div>
         <div>
-          <p>Username</p>
-          <p className="text-sm text-gray-500">Last Message</p>
+          <p>{props.username}</p>
+          <p className="text-sm text-gray-500">{props.lastMessage}</p>
         </div>
       </div>
       <div className="flex items-center gap-4">
-        <p className="text-sm text-gray-500">04:65 PM</p>
+        <p className="text-sm text-gray-500">{props.timestamp}</p>
         <RxDotsHorizontal />
       </div>
     </div>

@@ -197,43 +197,43 @@ class ChatController {
   }
 
   async renameGroupChat(req, res) {
-    try{
+    try {
 
-        const { chatID, chatName } = req.body;
+      const { chatID, chatName } = req.body;
 
-        if (!chatName) {
-            return response(res, http.BAD_REQUEST, "Chat name is required");
-        }
+      if (!chatName) {
+        return response(res, http.BAD_REQUEST, "Chat name is required");
+      }
 
-        const extChat = await chatModel.findOne({
-            _id: chatID,
-            participants: {
-                $elemMatch: { $eq: new mongoose.Types.ObjectId(req.user.userID) },
-            },
-        });
+      const extChat = await chatModel.findOne({
+        _id: chatID,
+        participants: {
+          $elemMatch: { $eq: new mongoose.Types.ObjectId(req.user.userID) },
+        },
+      });
 
-        if (!extChat) {
-            return response(res, http.NOT_FOUND, "Chat not found");
-        }
+      if (!extChat) {
+        return response(res, http.NOT_FOUND, "Chat not found");
+      }
 
-        if (!extChat.isGroupChat) {
-            return response(res, http.BAD_REQUEST, "This is not a group chat");
-        }
+      if (!extChat.isGroupChat) {
+        return response(res, http.BAD_REQUEST, "This is not a group chat");
+      }
 
-        if (extChat.admin.toString() !== req.user.userID.toString()) {
-            return response(res, http.UNAUTHORIZED, "Unauthorized");
-        }
+      if (extChat.admin.toString() !== req.user.userID.toString()) {
+        return response(res, http.UNAUTHORIZED, "Unauthorized");
+      }
 
-        const updateChat = await chatModel.findByIdAndUpdate(
-            chatID,
-            {
-                chatName,
-            },
-            { new: true }
-        );
-        return response(res, http.OK, "Chat name updated", updateChat);
+      const updateChat = await chatModel.findByIdAndUpdate(
+        chatID,
+        {
+          chatName,
+        },
+        { new: true }
+      );
+      return response(res, http.OK, "Chat name updated", updateChat);
     }
-    catch(error){
+    catch (error) {
       console.log(error);
       return response(
         res,
@@ -298,7 +298,8 @@ class ChatController {
         participants: {
           $elemMatch: { $eq: new mongoose.Types.ObjectId(req.user.userID) },
         },
-      });
+      }).populate("participants", "username email profilePic")
+      .populate("lastMessage", "content createdAt");
 
       if (chats.length === 0) {
         return response(res, http.NOT_FOUND, "Chats not found");
@@ -317,43 +318,43 @@ class ChatController {
   }
 
   async changeAdmin(req, res) {
-    try{
+    try {
 
-        const { chatID, userID } = req.body;
+      const { chatID, userID } = req.body;
 
-        const extChat = await chatModel.findOne({
-            _id: chatID,
-            participants: {
-                $elemMatch: { $eq: new mongoose.Types.ObjectId(req.user.userID) },
-            },
-        });
+      const extChat = await chatModel.findOne({
+        _id: chatID,
+        participants: {
+          $elemMatch: { $eq: new mongoose.Types.ObjectId(req.user.userID) },
+        },
+      });
 
-        if (!extChat) {
-            return response(res, http.NOT_FOUND, "Chat not found");
-        }
+      if (!extChat) {
+        return response(res, http.NOT_FOUND, "Chat not found");
+      }
 
-        if (!extChat.isGroupChat) {
-            return response(res, http.BAD_REQUEST, "This is not a group chat");
-        }
+      if (!extChat.isGroupChat) {
+        return response(res, http.BAD_REQUEST, "This is not a group chat");
+      }
 
-        if (extChat.admin.toString() !== req.user.userID.toString()) {
-            return response(res, http.UNAUTHORIZED, "Unauthorized");
-        }
+      if (extChat.admin.toString() !== req.user.userID.toString()) {
+        return response(res, http.UNAUTHORIZED, "Unauthorized");
+      }
 
-        if (!extChat.participants.includes(userID)) {
-            return response(res, http.NOT_FOUND, "User is not in this chat");
-        }
+      if (!extChat.participants.includes(userID)) {
+        return response(res, http.NOT_FOUND, "User is not in this chat");
+      }
 
-        const updateChat = await chatModel.findByIdAndUpdate(
-            chatID,
-            {
-                admin: userID,
-            },
-            { new: true }
-        );
-        return response(res, http.OK, "Admin changed", updateChat);
+      const updateChat = await chatModel.findByIdAndUpdate(
+        chatID,
+        {
+          admin: userID,
+        },
+        { new: true }
+      );
+      return response(res, http.OK, "Admin changed", updateChat);
     }
-    catch(error){
+    catch (error) {
       console.log(error);
       return response(
         res,
