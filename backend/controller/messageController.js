@@ -17,9 +17,9 @@ class MessageController {
       }
 
       const extChat = await chatModel.findById(chat);
-        if (!extChat) {
-            return response(res, http.NOT_FOUND, "Chat not found");
-        }
+      if (!extChat) {
+        return response(res, http.NOT_FOUND, "Chat not found");
+      }
 
       const userChats = await chatModel
         .find({
@@ -79,6 +79,12 @@ class MessageController {
     try {
       const { chatID } = req.params;
 
+      const extChat = await chatModel.findById(chatID);
+
+      if (!extChat) {
+        return response(res, http.NOT_FOUND, "Chat not found");
+      }
+
       const myChats = await chatModel
         .find({
           participants: {
@@ -115,25 +121,25 @@ class MessageController {
   }
 
   async deleteMessage(req, res) {
-    try{
+    try {
 
-        const { messageID } = req.params;
-        const extMessage = await messageModel.findById(messageID);
-        if(!extMessage){
-            return response(res, http.NOT_FOUND, "Message not found");
-        }
-        if (extMessage.sender.toString() !== req.user.userID.toString()) {
-            return response(res, http.UNAUTHORIZED, "Unauthorized");
-        }
+      const { messageID } = req.params;
+      const extMessage = await messageModel.findById(messageID);
+      if (!extMessage) {
+        return response(res, http.NOT_FOUND, "Message not found");
+      }
+      if (extMessage.sender.toString() !== req.user.userID.toString()) {
+        return response(res, http.UNAUTHORIZED, "Unauthorized");
+      }
 
-        const message = await messageModel.findByIdAndDelete(messageID);
-        if(!message){
-            return response(res, http.NOT_FOUND, "Message can not be deleted");
-        }
-        return response(res, http.OK, "Message deleted", message);
+      const message = await messageModel.findByIdAndDelete(messageID);
+      if (!message) {
+        return response(res, http.NOT_FOUND, "Message can not be deleted");
+      }
+      return response(res, http.OK, "Message deleted", message);
 
     }
-    catch(error){
+    catch (error) {
       console.log(error);
       return response(
         res,
@@ -143,11 +149,6 @@ class MessageController {
       );
     }
   }
-
-  
-
-
-
 }
 
 module.exports = new MessageController();
