@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import LoginPage from "./component/templates/LoginPage";
 import LoginAuthenticate from "./component/templates/LoginAuthenticate";
 import ChatPage from "./component/templates/ChatPage";
+import MessagePage from "./component/templates/MessagePage";
 
 const App = () => {
   return (
@@ -15,7 +16,8 @@ const App = () => {
         <Routes>
           <Route path="/" element={<LoginPage />} />
           <Route element={<LoginAuthenticate />}>
-            <Route path="chat" element={<ChatPage />} />
+            <Route path="/chat" element={<ChatPage />} />
+            <Route path="/message/:chatID" element={<MessagePage />} />
           </Route>
         </Routes>
       </BrowserRouter>

@@ -1,11 +1,20 @@
 import React from "react";
 import { RxDotsHorizontal } from "react-icons/rx";
+import { useNavigate } from "react-router-dom";
 
-type Props = {};
+type Props = {
+  chatID: number;
+};
 
 const ChatListMolecule = (props: Props) => {
+  const navigate = useNavigate();
   return (
-    <div className="flex justify-between items-center p-3">
+    <div
+      onClick={() => {
+        navigate(`/message/${props.chatID}`);
+      }}
+      className="flex justify-between items-center px-5 py-2"
+    >
       <div className="flex items-center gap-4">
         <div className="w-10 h-10">
           <img
@@ -15,11 +24,11 @@ const ChatListMolecule = (props: Props) => {
         </div>
         <div>
           <p>Username</p>
-          <p>Last Message</p>
+          <p className="text-sm text-gray-500">Last Message</p>
         </div>
       </div>
       <div className="flex items-center gap-4">
-        <p>04:65 PM</p>
+        <p className="text-sm text-gray-500">04:65 PM</p>
         <RxDotsHorizontal />
       </div>
     </div>
