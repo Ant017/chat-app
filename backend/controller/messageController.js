@@ -53,7 +53,7 @@ class MessageController {
 
       let message = await messageModel.create(newMessage);
 
-      let updateChat = await chatModel.findByIdAndUpdate(
+      await chatModel.findByIdAndUpdate(
         chat,
         {
           lastMessage: message._id,
@@ -61,9 +61,9 @@ class MessageController {
         { new: true }
       );
 
-      console.log("updateChat", updateChat);
+      const populatedMessage = await messageModel.findById(message._id).populate("sender", "username email profilePic").populate("chat", "participants");
 
-      return response(res, http.OK, "Message sent", message);
+      return response(res, http.OK, "Message sent", populatedMessage);
     } catch (error) {
       console.log(error);
       return response(

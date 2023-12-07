@@ -8,7 +8,9 @@ import { IoInformationCircleOutline } from "react-icons/io5";
 import { IoArrowBackOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { GetAllChatApi } from "../../apiCalls/ChatApi";
-
+import socket from "../../utils/socket";
+import { useRef } from "react";
+import Typing from "../atoms/Typing";
 type Sender = {
   _id: string;
   username: string;
@@ -53,8 +55,11 @@ const MessageListOrganism = () => {
   const { chatID } = useParams();
   const email = useSelector((state: any) => state.user.email);
   const [message, setMessage] = useState<Message[]>([]);
-
   const [chats, setChats] = useState<Chat[]>([]);
+  const pageReload = useSelector((state: any) => state.reload);
+  const scrollableDivRef = useRef(null);
+  const [isTyping, setIsTyping] = useState(false);
+  const [room, setRoom] = useState("");
 
   const navigate = useNavigate();
 
@@ -96,20 +101,46 @@ const MessageListOrganism = () => {
       setMessage(response);
     };
     getAllMessage();
-
-  }, []);
+  }, [pageReload]);
 
   useEffect(() => {
     const getAllChats = async () => {
       const result: Chat[] = await GetAllChatApi();
-      result.filter((chat) => chat._id.toString() === chatID?.toString());
-      setChats(result);
+       const newResult = result.filter((chat) => chat._id.toString() === chatID);
+      setChats(newResult);
     };
-
     getAllChats();
   }, []);
 
-  console.log("chat", chats);
+  useEffect(() => {
+    if (scrollableDivRef.current) {
+      (scrollableDivRef.current as HTMLDivElement).scrollTop = (
+        scrollableDivRef.current as HTMLDivElement
+      ).scrollHeight;
+    }
+  }, [message,isTyping]);
+  
+  useEffect(() => {
+    socket.on("typing",(room)=>{
+      setRoom(room);
+      setIsTyping(true);
+    })
+
+    socket.on("stop typing",(room)=>{
+      setRoom(room);
+      setIsTyping(false);
+    })
+
+  }, []);
+
+  useEffect(() => {
+    socket.on("message received", (newMessageReceived:any) => {
+      if(newMessageReceived.chat._id !== chatID) return;
+      setMessage([...message, newMessageReceived]);
+    });
+  });
+
+
 
   return (
     <div>
@@ -130,18 +161,18 @@ const MessageListOrganism = () => {
           <div className="flex justify-start items-center gap-4">
             <img
               className="w-10 h-10 object-cover object-center rounded-full"
-              src={getUserProfilePic(chats[0].participants, chats[0].isGroupChat)}
+               src={chats.length>0 ? getUserProfilePic(chats[0].participants, chats[0].isGroupChat):""}
               alt="User Avatar"
             ></img>
             <div>
-              <p>{getUsername(chats[0].participants, chats[0].isGroupChat)}</p>
+              <p>{chats.length>0 && getUsername(chats[0].participants, chats[0].isGroupChat , chats[0].chatName)}</p>
               <p className="text-sm text-gray-500">Active Now</p>
             </div>
           </div>
         </div>
         <IoInformationCircleOutline size={25} />
       </div>
-      <div className="h-[84vh] overflow-y-scroll px-3 mt-2">
+      <div ref={scrollableDivRef} className="h-[84vh] overflow-y-scroll px-3 mt-2">
         {message &&
           message.map((message) => {
             return (
@@ -161,6 +192,7 @@ const MessageListOrganism = () => {
               </div>
             );
           })}
+          {isTyping && room === chatID ? <div><Typing/></div>:null}
       </div>
     </div>
   );

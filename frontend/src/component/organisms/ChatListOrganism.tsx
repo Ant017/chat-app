@@ -74,11 +74,10 @@ const ChatListOrganism = () => {
     getAllChats();
   }, []);
 
-  console.log("chats", chats);
-
   return (
     <div className="h-[91vh] overflow-y-scroll">
-      {chats.map((chat) => (
+      {chats&&
+      chats.map((chat) => (
         <ChatListMolecule
           key={chat._id}
           chatID={chat._id}
@@ -86,9 +85,9 @@ const ChatListOrganism = () => {
             getUsername(chat.participants, chat.isGroupChat, chat.chatName) ||
             ""
           }
-          lastMessage={truncateText(chat.lastMessage.content, 25)}
+          lastMessage={ chat.lastMessage !== null ? truncateText(chat.lastMessage.content, 25):""}
           imageUrl={getUserProfilePic(chat.participants, chat.isGroupChat)}
-          timestamp={getTimeAgo(chat.lastMessage.createdAt)}
+          timestamp={chat.lastMessage !== null ? getTimeAgo(chat.lastMessage.createdAt):getTimeAgo(chat.createdAt)}
         />
       ))}
     </div>

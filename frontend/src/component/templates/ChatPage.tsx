@@ -2,7 +2,18 @@ import ChatListMolecule from "../molecules/ChatListMolecule";
 import { HiOutlineMenuAlt2 } from "react-icons/hi";
 import { IoIosAdd } from "react-icons/io";
 import ChatListOrganism from "../organisms/ChatListOrganism";
+import { useEffect, useState } from "react";
+import socket from "../../utils/socket";
 const ChatPage = () => {
+  const [socketConnected, setSocketConnected] = useState(false);
+  useEffect(() => {
+    const userID = localStorage.getItem('userID');
+    socket.emit('setup', userID);
+    socket.on("connection", () => {
+      setSocketConnected(true);
+    })
+  }, []);
+
   return (
     <>
       <div className="py-2">

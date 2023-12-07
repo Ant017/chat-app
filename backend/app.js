@@ -56,24 +56,48 @@ databaseConnection(() => {
         console.log('Server is running on 3000...');
     });
     const io = socketIO(server, {
+        pingTimeout: 60000,
         cors: {
-            origin: '*',
+            origin: process.env.FRONTEND_URL,
         },
     });
 
-    // Socket.io connection handling
     io.on('connection', (socket) => {
         console.log('A user connected');
 
-        // Handle messages from the client
-        socket.on('message', (message) => {
-            console.log('Received message:', message);
-
-            // Broadcast the message to all connected clients
-            io.emit('message', message);
+        socket.on('setup', (userData) => {
+            socket.join(userData);
+            console.log('UserConnected: ' + userData);
+            socket.emit('connected');
         });
 
-        // Handle disconnect
+        socket.on('join chat', (room) => {
+            socket.join(room);
+            console.log('User joined room: ' + room);
+        });
+
+        socket.on('new message', (newMessageReceived) => {
+            var chat = newMessageReceived.chat;
+            
+            if(!chat.participants) return console.log('Chat.participants not defined');
+            
+            chat.participants.forEach((participant) => {
+              
+                if(participant == newMessageReceived.sender._id){
+                    return;
+                };
+                socket.in(participant).emit('message received', newMessageReceived);
+            });
+        });
+
+        socket.on('typing', (room) => {
+            socket.in(room).emit('typing', room);
+        });
+
+        socket.on('stop typing', (room) => {
+            socket.in(room).emit('stop typing', room);
+        });
+
         socket.on('disconnect', () => {
             console.log('User disconnected');
         });

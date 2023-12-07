@@ -6,22 +6,15 @@ const authModel = require('../model/auth')
 const isUserLoggedIn = async (req, res, next) => {
     try {
         const { authorization } = req.headers
-        console.log("authorization", authorization)
-
         if (!authorization) {
             return response(res, http.BAD_REQUEST, "Authorization failed!")
         }
         const token = req.headers.authorization.split(" ")[1]
-
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
-        console.log("decoded", decoded)
-
         if (!decoded) {
             return response(res, http.BAD_REQUEST, "Authorization failed!")
         }
-
         const user = await authModel.findOne({ _id: decoded._id })
-
         if (!user) {
             return response(res, http.BAD_REQUEST, "User not found")
         }

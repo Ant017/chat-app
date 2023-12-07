@@ -41,6 +41,7 @@ const LoginBoxMolecule = () => {
         if (response) {
             dispatch(saveLogin(response));
             localStorage.setItem('token', response.token);
+            localStorage.setItem('userID', response.userID);
             navigate('/chat');
         }
     };
